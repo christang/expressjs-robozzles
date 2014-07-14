@@ -4,13 +4,21 @@ var Datastore = require('nedb'),
     db = new Datastore({ filename: 'puzzles.db', autoload: true });
 var _ = require('underscore-node');
 
+/* Enable CORS */
+router.all('*', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header("Access-Control-Allow-Headers", "Content-Type, X-Requested-With");
+  next();
+});
+
 /* GET puzzles listing. */
 router.get('/', function(req, res) {
   db.find({}, function(err, items) {
     if (err) {
       res.status(500).send('Service error');
     } else {
-      items = _.map(items, function (item) {return {_id: item._id};});
+      items = _.map(items, function (item) {return {_id: item._id, desc: item.desc};});
       res.send(items);
     }
   });
